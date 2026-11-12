@@ -33,9 +33,10 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     ensure_static_lib(&libs_dir, &target, &version)?;
 
     println!("cargo:rustc-link-search={}", target_dir.display());
-    println!("cargo:rustc-link-lib=z");
     if env::var("CARGO_CFG_WINDOWS").is_ok() {
         println!("cargo:rustc-link-lib=bcrypt");
+    } else {
+        println!("cargo:rustc-link-lib=z");
     }
     println!("cargo:rerun-if-changed={}", target_dir.display());
     Ok(())
