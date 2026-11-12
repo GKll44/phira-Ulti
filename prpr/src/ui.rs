@@ -1406,6 +1406,7 @@ thread_local! {
     pub static UI_BTN_HITSOUND_LARGE: RefCell<Option<Sfx>> = const { RefCell::new(None) };
     pub static UI_BTN_HITSOUND: RefCell<Option<Sfx>> = const { RefCell::new(None) };
     pub static UI_SWITCH_SOUND: RefCell<Option<Sfx>> = const { RefCell::new(None) };
+    pub static UI_PAUSE_SOUND: RefCell<Option<Sfx>> = const { RefCell::new(None) };
 }
 
 pub fn button_hit() {
@@ -1430,6 +1431,16 @@ pub fn button_hit_large() {
 
 pub fn list_switch() {
     UI_SWITCH_SOUND.with(|it| {
+        if let Some(sfx) = it.borrow_mut().as_mut() {
+            let _ = sfx.play(PlaySfxParams {
+                amplifier: f32::from_bits(UI_SFX_VOLUME.load(Ordering::Relaxed)),
+            });
+        }
+    });
+}
+
+pub fn pause_sound() {
+    UI_PAUSE_SOUND.with(|it| {
         if let Some(sfx) = it.borrow_mut().as_mut() {
             let _ = sfx.play(PlaySfxParams {
                 amplifier: f32::from_bits(UI_SFX_VOLUME.load(Ordering::Relaxed)),
