@@ -12,6 +12,9 @@ pub use game::{GameMode, GameScene, SimpleRecord};
 mod loading;
 pub use loading::{BasicPlayer, LoadingScene, SaveFn, UpdateFn, UploadFn};
 
+#[cfg(target_os = "windows")]
+mod win_input;
+
 use crate::{
     ext::{draw_image, screen_aspect, LocalTask, SafeTexture, ScaleType},
     judge::Judge,
@@ -20,10 +23,10 @@ use crate::{
 };
 use anyhow::{Error, Result};
 use cfg_if::cfg_if;
-use inputbox::{
-    backend::{default_backend, Backend},
-    InputBox,
-};
+use inputbox::{backend::Backend, InputBox};
+
+#[cfg(not(target_os = "windows"))]
+use inputbox::backend::default_backend;
 use macroquad::prelude::*;
 use std::{
     any::Any,
@@ -192,6 +195,9 @@ pub fn request_input(id: impl Into<String>, mut config: InputBox) {
     if config.ok_label.is_none() {
         config = config.ok_label(ttl!("confirm"));
     }
+    #[cfg(target_os = "windows")]
+    show_inputbox(config, win_input::backend());
+    #[cfg(not(target_os = "windows"))]
     show_inputbox(config, &*default_backend());
 }
 
@@ -387,6 +393,8 @@ pub struct Main {
 
 impl Main {
     pub async fn new(mut scene: Box<dyn Scene>, mut tm: TimeManager, mut target_chooser: impl RenderTargetChooser + 'static) -> Result<Self> {
+        #[cfg(target_os = "windows")]
+        win_input::warmup();
         simulate_mouse_with_touch(false);
         scene.enter(&mut tm, target_chooser.choose())?;
         let last_update_time = tm.now();
