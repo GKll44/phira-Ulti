@@ -141,6 +141,7 @@ impl MainScene {
         load_sfx!(UI_BTN_HITSOUND_LARGE, "button_large.ogg");
         load_sfx!(UI_BTN_HITSOUND, "button.ogg");
         load_sfx!(UI_SWITCH_SOUND, "switch.ogg");
+        load_sfx!(UI_PAUSE_SOUND, "paused.ogg");
 
         let background: SafeTexture = load_texture("background.jpg").await?.into();
         let icon_back: SafeTexture = load_texture("back.png").await?.into();
